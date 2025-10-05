@@ -3,42 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_navigation"
-    app:startDestination="@id/ukurFragment">
+    app:startDestination="@id/itemUkur">
 
     <fragment
-        android:id="@+id/ukurFragment"
+        android:id="@+id/itemUkur"
         android:name="com.example.eskikoprojectuts.view.UkurFragment"
         android:label="fragment_ukur"
-        tools:layout="@layout/fragment_ukur" >
-        <action
-            android:id="@+id/action_ukurFragment_to_dataListFragment"
-            app:destination="@id/dataListFragment" />
-        <action
-            android:id="@+id/action_ukurFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_ukur" />
     <fragment
-        android:id="@+id/dataListFragment"
+        android:id="@+id/itemData"
         android:name="com.example.eskikoprojectuts.view.DataListFragment"
         android:label="fragment_data_list"
-        tools:layout="@layout/fragment_data_list" >
-        <action
-            android:id="@+id/action_dataListFragment_to_ukurFragment"
-            app:destination="@id/ukurFragment" />
-        <action
-            android:id="@+id/action_dataListFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_data_list" />
     <fragment
-        android:id="@+id/profileFragment"
+        android:id="@+id/itemProfile"
         android:name="com.example.eskikoprojectuts.view.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" >
-        <action
-            android:id="@+id/action_profileFragment_to_dataListFragment"
-            app:destination="@id/dataListFragment" />
-        <action
-            android:id="@+id/action_profileFragment_to_ukurFragment"
-            app:destination="@id/ukurFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_profile" />
 </navigation>
