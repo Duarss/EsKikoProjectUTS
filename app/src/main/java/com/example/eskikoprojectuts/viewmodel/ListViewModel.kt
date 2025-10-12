@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.eskikoprojectuts.util.FileHelper
 
+// fragment ukur
 class ListViewModel (application: Application): AndroidViewModel(application) {
     val messageLD = MutableLiveData<String>()
 
