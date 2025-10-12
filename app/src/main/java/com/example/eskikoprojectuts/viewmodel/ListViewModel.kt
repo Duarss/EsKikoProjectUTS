@@ -1,4 +1,11 @@
 package com.example.eskikoprojectuts.viewmodel
 
-class ListViewModel {
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+
+class ListViewModel (application: Application): AndroidViewModel(application) {
+    val messageLD = MutableLiveData<String>()
+
+
 }
