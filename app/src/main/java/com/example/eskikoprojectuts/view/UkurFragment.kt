@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.eskikoprojectuts.R
 import com.example.eskikoprojectuts.databinding.FragmentUkurBinding
@@ -38,7 +39,14 @@ class UkurFragment : Fragment() {
 
             viewModel.simpanData(berat, tinggi, usia)
         }
+
+        observeViewModel()
     }
 
+    fun observeViewModel(){
+        viewModel.messageLD.observe(viewLifecycleOwner){
+            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+        }
+    }
 
 }
