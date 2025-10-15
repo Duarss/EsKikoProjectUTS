@@ -21,10 +21,10 @@ class FileHelper (val context: Context) {
     fun writeToFile(data:String){
         try {
             val file = getFile()
-            // append = true -> data baru dilanjutkan
-            // append = false  -> data baru mereplace data lama
-            FileOutputStream(file, true).use {
-                    output -> output.write((data + "\n").toByteArray())
+            // append = false -> data baru dilanjutkan
+            // append = true -> data baru mereplace data lama
+            FileOutputStream(file, false).use { output ->
+                output.write(data.toByteArray())
             }
         } catch (e: IOException) {
             e.printStackTrace()
