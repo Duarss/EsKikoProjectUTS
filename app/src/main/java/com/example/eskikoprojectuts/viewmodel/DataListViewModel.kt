@@ -5,47 +5,38 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.eskikoprojectuts.model.Anak
 import com.example.eskikoprojectuts.util.FileHelper
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 // fragment data
-class DataListViewModel (application: Application): AndroidViewModel(application){
+class DataListViewModel (application: Application): AndroidViewModel(application) {
     val dataLD = MutableLiveData<ArrayList<Anak>>()
     val dataLoadErrorLD = MutableLiveData<Boolean>()
     val loadingLD = MutableLiveData<Boolean>()
 
     fun refresh() {
-        loadingLD.value = true          // progress barnya mulai muncul
+        loadingLD.value = true  // progress barnya mulai muncul
         dataLoadErrorLD.value = false
 
-        val fileHelper = FileHelper(getApplication())
-        val dataString = fileHelper.readFromFile()
-        val anakList = ArrayList<Anak>()
+        val context = getApplication<Application>().applicationContext
+        val fileHelper = FileHelper(context)
+        val jsonString = fileHelper.readFromFile()
 
-        if (dataString.isNotEmpty()){
-            val lines = dataString.split("\n").filter { it.isNotBlank() }
-
-            for (line in lines) {
-                val parts = line.split("|")
-
-                val usiaText = parts[0].trim().substringAfter(":").substringBefore("tahun").trim()
-                val tinggiText = parts[1].trim().substringAfter(":").substringBefore("cm").trim()
-                val beratText = parts[2].trim().substringAfter(":").substringBefore("kg").trim()
-
-                val anak = Anak(
-                    beratText.toDoubleOrNull(),
-                    tinggiText.toDoubleOrNull(),
-                    usiaText.toIntOrNull()
-                )
-                anakList.add(anak)
+        if (jsonString.isNotEmpty()) {
+            try {
+                val sType = object : TypeToken<List<Anak>>() {}.type
+                val result = Gson().fromJson<List<Anak>>(jsonString, sType)
+                dataLD.value = result as ArrayList<Anak>
+                dataLoadErrorLD.value = false
+            } catch (e: Exception) {
+                dataLoadErrorLD.value = true
             }
-
-            dataLD.value = anakList
-            dataLoadErrorLD.value = false
+        } else {
+            dataLoadErrorLD.value = true
         }
 
-        else {
-            dataLD.value = arrayListOf()
-            dataLoadErrorLD.value = false
-        }
-
+        loadingLD.value = false
     }
+
 }
+
