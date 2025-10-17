@@ -30,7 +30,7 @@ class UkurFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this).get(ListViewModel::class.java)
+        viewModel = ViewModelProvider(this)[ListViewModel::class.java]
 
         binding.btnTambah.setOnClickListener {
             val berat = binding.txtBerat.text.toString()
@@ -38,14 +38,26 @@ class UkurFragment : Fragment() {
             val usia = binding.txtUsia.text.toString()
 
             viewModel.simpanData(berat, tinggi, usia)
+
+            binding.txtBerat.text?.clear()
+            binding.txtTinggi.text?.clear()
+            binding.txtUsia.text?.clear()
         }
 
         observeViewModel()
     }
 
     fun observeViewModel(){
-        viewModel.messageLD.observe(viewLifecycleOwner){
-            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+        // Tampilkan toast hanya saat event baru diterima (one-time)
+        viewModel.saveMessageEvent.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { msg ->
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+            }
+        }
+        viewModel.errorMessageEvent.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { msg ->
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

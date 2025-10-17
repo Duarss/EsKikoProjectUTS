@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.eskikoprojectuts.R
 import com.example.eskikoprojectuts.databinding.FragmentDataListBinding
 import com.example.eskikoprojectuts.viewmodel.DataListViewModel
+import com.example.eskikoprojectuts.viewmodel.ListViewModel
 
 class DataListFragment : Fragment() {
     private lateinit var binding: FragmentDataListBinding
@@ -29,7 +30,7 @@ class DataListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // init the vm
-        viewModel = ViewModelProvider(this).get(DataListViewModel::class.java)
+        viewModel = ViewModelProvider(this)[DataListViewModel::class.java]
         observeViewModel()
 
         // setup recycler view
