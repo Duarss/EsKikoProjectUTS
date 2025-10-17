@@ -9,42 +9,25 @@ import com.example.eskikoprojectuts.util.FileHelper
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-// ---- Event wrapper sederhana untuk one-time message ----
-class Event<out T>(private val content: T) {
-    private var hasBeenHandled = false
-    fun getContentIfNotHandled(): T? {
-        return if (hasBeenHandled) null else {
-            hasBeenHandled = true
-            content
-        }
-    }
-    fun peekContent(): T = content
-}
-
 // fragment ukur
 class ListViewModel(application: Application) : AndroidViewModel(application) {
 
-    // Ubah dari String biasa -> Event<String> agar one-time
-    val saveMessageEvent = MutableLiveData<Event<String>>()
-    val errorMessageEvent = MutableLiveData<Event<String>>() // optional, kalau mau toast error juga
+    // Pesan error (opsional, agar bisa tampilkan toast error saat validasi/exception)
+    val errorMessageLD = MutableLiveData<String?>()
+
+    // Flag sukses simpan. Di-observe di Fragment untuk menampilkan Toast sekali,
+    // lalu direset ke false lagi agar tidak retrigger saat re-attach observer.
+    val saveSuccessLD = MutableLiveData<Boolean>(false)
 
     fun simpanData(berat: String, tinggi: String, usia: String) {
         val fileHelper = FileHelper(getApplication())
 
-        val w = berat.trim()
-        val h = tinggi.trim()
-        val u = usia.trim()
-
-        if (w.isEmpty() || h.isEmpty() || u.isEmpty()) {
-            errorMessageEvent.value = Event("Semua data wajib diisi")
+        if (berat.isEmpty() || tinggi.isEmpty() || usia.isEmpty()) {
+            errorMessageLD.value = "Semua data wajib diisi"
             return
         }
 
         try {
-            val weight = w.toDouble()
-            val height = h.toDouble()
-            val age = u.toInt()
-
             val jsonOld = fileHelper.readFromFile()
             val sType = object : TypeToken<MutableList<Anak>>() {}.type
 
@@ -52,23 +35,37 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
                 if (jsonOld.trimStart().startsWith("[")) {
                     Gson().fromJson(jsonOld, sType)
                 } else {
-                    mutableListOf() // jika bukan array, mulai list baru
+                    mutableListOf() // jika bukan array atau kosong, mulai list baru
                 }
             } catch (_: Exception) {
                 mutableListOf()
             }
 
-            val newData = Anak(weight = weight, height = height, usia = age)
+            val newData = Anak(
+                weight = berat.toDouble(),
+                height = tinggi.toDouble(),
+                usia = usia.toInt()
+            )
             listOld.add(newData)
 
             val jsonNew = Gson().toJson(listOld)
             fileHelper.writeToFile(jsonNew)
 
-            // Kirim event satu-kali SAJA untuk sukses simpan
-            saveMessageEvent.value = Event("Data berhasil disimpan")
+            // Trigger sukses -> Fragment akan menampilkan Toast, lalu kita reset flag-nya
+            saveSuccessLD.value = true
         } catch (e: Exception) {
             Log.e("Error", e.message.toString())
-            errorMessageEvent.value = Event("Data gagal disimpan: ${e.message}")
+            errorMessageLD.value = "Data gagal disimpan: ${e.message}"
         }
+    }
+
+    // Dipanggil Fragment setelah Toast sukses ditampilkan, agar tidak retrigger
+    fun resetSaveSuccessFlag() {
+        saveSuccessLD.value = false
+    }
+
+    // Dipanggil Fragment setelah Toast error ditampilkan, agar tidak retrigger
+    fun clearError() {
+        errorMessageLD.value = null
     }
 }

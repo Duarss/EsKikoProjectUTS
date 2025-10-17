@@ -48,15 +48,20 @@ class UkurFragment : Fragment() {
     }
 
     fun observeViewModel(){
-        // Tampilkan toast hanya saat event baru diterima (one-time)
-        viewModel.saveMessageEvent.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { msg ->
-                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+        // Tampilkan Toast sukses hanya ketika saveSuccessLD = true,
+        // lalu reset flag agar tidak muncul lagi saat fragment re-attach.
+        viewModel.saveSuccessLD.observe(viewLifecycleOwner) { isSuccess ->
+            if (isSuccess == true) {
+                Toast.makeText(requireContext(), "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
+                viewModel.resetSaveSuccessFlag()
             }
         }
-        viewModel.errorMessageEvent.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { msg ->
-                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+
+        // Tampilkan error jika ada, lalu clear agar tidak retrigger saat re-attach.
+        viewModel.errorMessageLD.observe(viewLifecycleOwner) { msg ->
+            msg?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                viewModel.clearError()
             }
         }
     }
